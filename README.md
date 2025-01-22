@@ -298,5 +298,79 @@ Queue flushed.
 
 ---
 
+## Timer Module
+
+### Overview
+The timer module provides a flexible and efficient mechanism to manage timers with customizable expiry periods and callbacks. It integrates with the priority queue to ensure timers are managed and executed based on their expiration time. Periodic timers are also supported, allowing for repetitive callbacks at a specified interval.
+
+### Features
+- **Customizable Callbacks**: Allows user-defined callbacks to be triggered upon timer expiration.
+- **Periodic and One-Shot Timers**: Supports both single-use and repeating timers.
+- **Integration with Priority Queue**: Uses the priority queue to efficiently handle timers based on their expiration times.
+- **Efficient Bulk Reordering**: Performs reordering only when necessary to optimize performance.
+
+### Functions
+
+- **Initialization**:
+- `void timer_module_init(void);`
+    Initializes the timer module and the global timer queue.
+
+- `void timer_init(struct timer *timer, void (*callback)(struct timer *timer, void *data), void *data);`
+    Initializes a timer with a user-defined callback and optional data.
+
+- **Timer Management**:
+- `void timer_start(struct timer *timer, uint64_t ticks, bool periodic);`
+    Starts or restarts a timer with a specified expiry time in ticks and periodicity.
+
+- `void timer_stop(struct timer *timer);`
+    Stops a timer and removes it from the timer queue.
+
+- `void timer_set_period(struct timer *timer, uint64_t ticks);`
+    Updates the expiry period of a timer.
+
+- **Global Tick Handling**:
+- `void timer_increment_tick(void);`
+    Increments the global tick counter, processes expired timers, and reinserts periodic timers into the queue.
+
+### Example Usage
+
+```c
+#include "timer_module.h"
+#include <stdio.h>
+
+void timer_callback(struct timer *timer, void *data) {
+printf("Timer expired! Message: %s\n", (char *)data);
+}
+
+int main(void) {
+struct timer t1, t2;
+
+timer_module_init();
+
+timer_init(&t1, timer_callback, "One-shot Timer");
+timer_start(&t1, 100, false);
+
+timer_init(&t2, timer_callback, "Periodic Timer");
+timer_start(&t2, 50, true);
+
+for (int i = 0; i < 200; i++) {
+    timer_increment_tick();
+}
+
+timer_stop(&t2);
+
+return 0;
+}
+```
+
+### Example Output
+```
+Timer expired! Message: Periodic Timer
+Timer expired! Message: One-shot Timer
+Timer expired! Message: Periodic Timer
+Timer expired! Message: Periodic Timer
+Timer expired! Message: Periodic Timer
+```
+
 ### License
 This project is licensed under the MIT License. See the license details in each file.
