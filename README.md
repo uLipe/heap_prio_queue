@@ -223,6 +223,79 @@ int main(void)
 }
 ```
 
+## Fixed-Size Message Queue
+
+### Overview
+A fixed-size message queue designed for efficient single-producer, single-consumer communication. It supports operations for pushing, peeking, popping, and flushing messages. The queue ensures that the number of slots is rounded down to the nearest power of two for efficient bitmask-based indexing.
+
+### Features
+- **Power-of-Two Slots**: The number of slots is rounded down to the nearest power of two for efficient index calculations.
+- **Compile-Time Buffer Declaration**: Use a macro to declare a buffer of the appropriate size for a given number of slots and message size.
+- **Efficient Operations**:
+    - Push: Add a message to the queue.
+    - Peek: View the next message without removing it.
+    - Pop: Remove and retrieve the next message.
+    - Flush: Clear all messages from the queue.
+- **Error Handling**: Returns error codes (`-ENOBUFS` for full queue, `-EAGAIN` for empty queue).
+
+### Files
+- `fixed_message_queue.h`: Header-only implementation.
+
+### Usage Example
+```c
+#include "fixed_message_queue.h"
+#include <stdio.h>
+#include <string.h>
+
+int main(void)
+{
+    // Declare a buffer for 10 slots of 32-byte messages
+    DECLARE_MESSAGE_QUEUE_BUFFER(10, 32);
+    struct message_queue mq;
+
+    // Initialize the message queue
+    message_queue_init(&mq, buffer, 32, 10);
+
+    // Push a message
+    char message[32] = "Hello, Queue!";
+    if (message_queue_push(&mq, message) == 0) {
+        printf("Message pushed successfully.\\n");
+    } else {
+        printf("Failed to push message: Queue is full.\\n");
+    }
+
+    // Peek at the message
+    char peeked_message[32];
+    if (message_queue_peek(&mq, peeked_message) == 0) {
+        printf("Peeked message: %s\\n", peeked_message);
+    } else {
+        printf("Failed to peek message: Queue is empty.\\n");
+    }
+
+    // Pop the message
+    char popped_message[32];
+    if (message_queue_pop(&mq, popped_message) == 0) {
+        printf("Popped message: %s\\n", popped_message);
+    } else {
+        printf("Failed to pop message: Queue is empty.\\n");
+    }
+
+    // Flush the queue
+    message_queue_flush(&mq);
+    printf("Queue flushed.\\n");
+
+    return 0;
+}
+```
+
+### Example Output
+```
+Message pushed successfully.
+Peeked message: Hello, Queue!
+Popped message: Hello, Queue!
+Queue flushed.
+```
+
 ---
 
 ### License
