@@ -25,11 +25,13 @@
 #ifndef PRIORITY_QUEUE_H
 #define PRIORITY_QUEUE_H
 
+#include <stddef.h>
+
 /**
- * struct heap_node - intrusive heap node structure
- * @next: pointer to the next node
- * @prev: pointer to the previous node
- * @parent: pointer to the parent node
+ * struct heap_node - Intrusive heap node structure
+ * @next: Pointer to the next node
+ * @prev: Pointer to the previous node
+ * @parent: Pointer to the parent node
  */
 struct heap_node {
     struct heap_node *next;
@@ -38,11 +40,11 @@ struct heap_node {
 };
 
 /**
- * struct priority_queue - priority queue structure
- * @head: pointer to the head of the queue
- * @tail: pointer to the tail of the queue
- * @root: pointer to the root of the heap
- * @compare: function pointer to the comparison function
+ * struct priority_queue - Priority queue structure
+ * @head: Pointer to the head of the queue
+ * @tail: Pointer to the tail of the queue
+ * @root: Pointer to the root of the heap
+ * @compare: Function pointer to the comparison function
  */
 struct priority_queue {
     struct heap_node *head;
@@ -52,29 +54,36 @@ struct priority_queue {
 };
 
 /**
- * pq_init - Initializes a priority queue
- * @pq: pointer to the priority queue structure
- * @compare: function pointer to the comparison function
- * 
- * Return: 0 on success, or -EINVAL if parameters are invalid
+ * pq_init - Initialize the priority queue
+ * @pq: Pointer to the priority queue
+ * @compare: Comparison function for heap nodes
+ *
+ * Return: 0 on success, -EINVAL on invalid parameters
  */
 int pq_init(struct priority_queue *pq, int (*compare)(struct heap_node *, struct heap_node *));
 
 /**
- * pq_insert - Inserts a node into the priority queue
- * @pq: pointer to the priority queue structure
- * @node: pointer to the heap node to insert
- * 
- * Return: 0 on success, or -EINVAL if parameters are invalid
+ * pq_insert - Insert a node into the priority queue without reordering
+ * @pq: Pointer to the priority queue
+ * @node: Pointer to the node to be inserted
+ *
+ * Return: 0 on success, -EINVAL on invalid parameters
  */
 int pq_insert(struct priority_queue *pq, struct heap_node *node);
 
 /**
- * pq_pop - Pops the highest-priority node from the priority queue
- * @pq: pointer to the priority queue structure
- * 
- * Return: pointer to the highest-priority heap node, or NULL on error
+ * pq_pop - Remove and return the highest-priority node
+ * @pq: Pointer to the priority queue
+ *
+ * Return: Pointer to the highest-priority node, or NULL on failure
  */
 struct heap_node *pq_pop(struct priority_queue *pq);
 
+/**
+ * pq_reorder - Reorder the priority queue to maintain the heap property
+ * @pq: Pointer to the priority queue
+ */
+void pq_reorder(struct priority_queue *pq);
+
 #endif /* PRIORITY_QUEUE_H */
+

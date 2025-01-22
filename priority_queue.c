@@ -73,24 +73,13 @@ int pq_insert(struct priority_queue *pq, struct heap_node *node)
     }
 
     if (!pq->head) {
-        pq->head = node;
+        pq->head = pq->tail = pq->root = node;
+        node->parent = node->next = node->prev = NULL;
+    } else {
+        pq->tail->next = node;
+        node->prev = pq->tail;
         pq->tail = node;
-        pq->root = node;
-        node->parent = NULL;
         node->next = NULL;
-        node->prev = NULL;
-
-        return 0;
-    }
-
-    pq->tail->next = node;
-    node->prev = pq->tail;
-    pq->tail = node;
-    node->next = NULL;
-
-    struct heap_node *current = node;
-    while (current->parent && pq->compare(current, current->parent) > 0) {
-        swap_nodes(current, current->parent);
     }
 
     return 0;
@@ -111,10 +100,7 @@ struct heap_node *pq_pop(struct priority_queue *pq)
     struct heap_node *root = pq->root;
 
     if (pq->head == pq->tail) {
-        pq->head = NULL;
-        pq->tail = NULL;
-        pq->root = NULL;
-
+        pq->head = pq->tail = pq->root = NULL;
         return root;
     }
 
@@ -125,8 +111,16 @@ struct heap_node *pq_pop(struct priority_queue *pq)
     }
 
     pq->tail = pq->tail->prev;
-    pq->root->next = NULL;
-    pq->root->prev = NULL;
+    pq->root->next = pq->root->prev = NULL;
+
+    return root;
+}
+
+void pq_reorder(struct priority_queue *pq)
+{
+    if (unlikely(!pq || !pq->head)) {
+        return;
+    }
 
     struct heap_node *current = pq->root;
     while (1) {
@@ -146,6 +140,5 @@ struct heap_node *pq_pop(struct priority_queue *pq)
 
         swap_nodes(current, largest);
     }
-
-    return root;
 }
+
