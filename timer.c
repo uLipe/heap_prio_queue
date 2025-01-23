@@ -71,6 +71,7 @@ void timer_increment_tick(void)
 {
     global_ticks++;
 
+    bool expired = false;
     struct timer *next_timer = NULL;
     struct heap_node *node = pq_peek(&timer_queue);
 
@@ -81,11 +82,13 @@ void timer_increment_tick(void)
         if (next_timer->period) {
             next_timer->expiry += next_timer->period;
             pq_insert(&timer_queue, &next_timer->node);
+	    expired = true;
         }
 
         node = pq_peek(&timer_queue);
     }
 
-    pq_reorder(&timer_queue);
+    if(expired)
+    	pq_reorder(&timer_queue);
 }
 

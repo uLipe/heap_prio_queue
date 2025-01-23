@@ -80,6 +80,15 @@ int pq_insert(struct priority_queue *pq, struct heap_node *node);
 struct heap_node *pq_pop(struct priority_queue *pq);
 
 /**
+ * pq_peek - Retrieve the highest-priority node without removing it
+ * @pq: Pointer to the priority queue
+ *
+ * Return: Pointer to the highest-priority node (root of the heap), or NULL if the queue is empty.
+ */
+struct heap_node *pq_peek(struct priority_queue *pq);
+
+
+/**
  * pq_reorder - Reorder the priority queue to maintain the heap property
  * @pq: Pointer to the priority queue
  */

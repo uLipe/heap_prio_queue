@@ -88,12 +88,10 @@ int pq_insert(struct priority_queue *pq, struct heap_node *node)
 struct heap_node *pq_pop(struct priority_queue *pq)
 {
     if (unlikely(!pq)) {
-        errno = EINVAL;
         return NULL;
     }
 
     if (!pq->head) {
-        errno = ENOENT;
         return NULL;
     }
 
@@ -114,6 +112,15 @@ struct heap_node *pq_pop(struct priority_queue *pq)
     pq->root->next = pq->root->prev = NULL;
 
     return root;
+}
+
+struct heap_node *pq_peek(struct priority_queue *pq)
+{
+    if (unlikely(!pq || !pq->root)) {
+        return NULL;
+    }
+
+    return pq->root;
 }
 
 void pq_reorder(struct priority_queue *pq)
